@@ -148,57 +148,9 @@ def generate_fakes(data: dict, source_filename: str, header_filename: str) -> li
     return fake_list
 
 
-def main(opts):
-    import json
-
-    # args check
-    if not Path(opts.dir).is_dir():
-        print(f"Output '{opts.dir}' exptected to be directory",
-              file=sys.stderr)
-        sys.exit(1)
-
-    source_file = Path(opts.dir, f"{opts.name}.cc")
-    header_file = Path(opts.dir, f"{opts.name}.h")
-
-    if source_file.is_file() or header_file.is_file():
-        if not (opts.force or opts.merge):
-            print("Files already exist use -f, --force to overwrite or -m, --merge to try to merge it",
-                  file=sys.stderr)
-            sys.exit(1)
-    else:
-        if opts.merge:
-            print("Merge option set, but files not exist. Check your path!")
-            sys.exit(1)
-
-    # read json data from stdin or file
-    input_file = sys.stdin
-    if opts.json is not None:
-        input_file = open(opts.json, 'r')
-
-    json_data = []
-
-    try:
-        json_data = json.load(input_file)
-    except json.JSONDecodeError as e:
-        print(f"Error decoding JSON: {e}", file=sys.stderr)
-        sys.exit(1)
-    finally:
-        if opts.json is not None:
-            input_file.close()
-
-    if opts.merge:
-        merged, generated_list = merge_fakes(json_data, source_file, header_file)
-        if not merged:
-            sys.exit(1)
-    else:
-        generated_list = generate_fakes(
-            json_data, source_file, header_file)
-
-    print(f"Generated {len(generated_list)} fake functions")
-
-
-if __name__ == '__main__':
+def main():
     from optparse import OptionParser
+    import json
 
     parser = OptionParser("usage: %prog [-j JSON_FILE]")
     parser.add_option(
@@ -247,4 +199,51 @@ if __name__ == '__main__':
     parser.disable_interspersed_args()
     (opts, args) = parser.parse_args()
 
-    main(opts)
+    # args check
+    if not Path(opts.dir).is_dir():
+        print(f"Output '{opts.dir}' exptected to be directory",
+              file=sys.stderr)
+        sys.exit(1)
+
+    source_file = Path(opts.dir, f"{opts.name}.cc")
+    header_file = Path(opts.dir, f"{opts.name}.h")
+
+    if source_file.is_file() or header_file.is_file():
+        if not (opts.force or opts.merge):
+            print("Files already exist use -f, --force to overwrite or -m, --merge to try to merge it",
+                  file=sys.stderr)
+            sys.exit(1)
+    else:
+        if opts.merge:
+            print("Merge option set, but files not exist. Check your path!")
+            sys.exit(1)
+
+    # read json data from stdin or file
+    input_file = sys.stdin
+    if opts.json is not None:
+        input_file = open(opts.json, 'r')
+
+    json_data = []
+
+    try:
+        json_data = json.load(input_file)
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}", file=sys.stderr)
+        sys.exit(1)
+    finally:
+        if opts.json is not None:
+            input_file.close()
+
+    if opts.merge:
+        merged, generated_list = merge_fakes(json_data, source_file, header_file)
+        if not merged:
+            sys.exit(1)
+    else:
+        generated_list = generate_fakes(
+            json_data, source_file, header_file)
+
+    print(f"Generated {len(generated_list)} fake functions")
+
+
+if __name__ == '__main__':
+    main()
