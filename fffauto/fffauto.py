@@ -18,17 +18,23 @@ def generate_fake_list(function_names: list) -> str:
 
 
 def generate_declaration(name, return_type, args_types) -> str:
+    args_str = ','.join(map(str, args_types))
+    if args_str:
+        args_str = ', ' + args_str
     if return_type == 'void':
-        return f"DECLARE_FAKE_VOID_FUNC({name}, {','.join(map(str, args_types))});\n"
+        return f"DECLARE_FAKE_VOID_FUNC({name}{args_str});\n"
     else:
-        return f"DECLARE_FAKE_VALUE_FUNC({return_type}, {name}, {','.join(map(str, args_types))});\n"
+        return f"DECLARE_FAKE_VALUE_FUNC({return_type}, {name}{args_str});\n"
 
 
 def generate_definition(name, return_type, args_types) -> str:
+    args_str = ','.join(map(str, args_types))
+    if args_str:
+        args_str = ', ' + args_str
     if return_type == 'void':
-        return f"DEFINE_FAKE_VOID_FUNC({name}, {','.join(map(str, args_types))});\n"
+        return f"DEFINE_FAKE_VOID_FUNC({name}{args_str});\n"
     else:
-        return f"DEFINE_FAKE_VALUE_FUNC({return_type}, {name}, {','.join(map(str, args_types))});\n"
+        return f"DEFINE_FAKE_VALUE_FUNC({return_type}, {name}{args_str});\n"
 
 
 def merge_source(data: dict, filename: str, tmp_file: str) -> list:
