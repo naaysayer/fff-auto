@@ -2,7 +2,7 @@ Generate [FFF library](https://github.com/meekrosoft/fff) files, with fakes func
 
 Usage:
 ```
-usage: autofff.py [-h] [--dry-run] [--exclude [EXCLUDE ...]] [-p PATH] [-v] [-f] [--store-cache] [-m] [--single-file] [-r REGEX] [-o OUT] [FILE] [CFLAGS ...]
+usage: fffauto.py [-h] [--dry-run] [--exclude [EXCLUDE ...]] [-p PATH] [-v] [-f] [--store-cache] [-m] [--single-file] [-r REGEX] [-o OUT] [FILE] [CFLAGS ...]
 
 Generate FFF library fakes from source files. Fakes generated from expression in AST of a source file using regex
 

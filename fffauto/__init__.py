@@ -1,1 +1,1 @@
-# fffauto/fffauto/main.py
+import fffauto.fff as fff

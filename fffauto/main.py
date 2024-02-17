@@ -2,7 +2,7 @@
 
 import logging
 import sys
-import fff
+import fffauto.fff as fff
 import json
 import os
 

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-
-from typing import Callable
 from clang import cindex
-import ast
 import re
+
+import fffauto.ast as ast
 
 # for some node.kinds arguments are empty, but node.type contains info about arguments like that int(int arg1, char)
 _ftype_pattern = re.compile(
