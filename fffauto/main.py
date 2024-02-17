@@ -99,9 +99,6 @@ def main():
     parser.add_argument('-f', '--force',
                         help='overwrite existing files',
                         action='store_true')
-    parser.add_argument('--store-cache',
-                        help='Do not remove cache file with parsed fakes',
-                        action='store_true')
     parser.add_argument('-m', '--merge',
                         help=f"""Merge with existing files.
                         Generated fake would be added after

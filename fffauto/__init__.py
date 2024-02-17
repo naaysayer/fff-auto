@@ -1,0 +1,1 @@
+# fffauto/fffauto/main.py

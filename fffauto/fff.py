@@ -5,9 +5,7 @@ from clang import cindex
 import ast
 import re
 
-# for some node.kinds arguments are empty,
-# but node.type contains info about arguments
-# like that int(int arg1, char arg2)
+# for some node.kinds arguments are empty, but node.type contains info about arguments like that int(int arg1, char)
 _ftype_pattern = re.compile(
     r'(?P<return_type>\w+(\s\*)?)\s?\(\s*(?P<arg_types>.*?)\s*\)(?:\s*\(\*\))?')
 
@@ -16,6 +14,14 @@ FAKE_LIST_STR = "#define FFF_FAKE_LIST(FAKE)\\\n"
 
 
 class Fake:
+    """
+    Represents a EXPRESSION or FUNCTION_DECLARATION parsed from ast with cland.cindex
+
+    Attributes:
+        spelling (str): The name of the function.
+        arg_types (list[str] or None): The list of argument types, or None if there are no arguments.
+        return_type (str or None): The return type of the function, or None for void functions.
+    """
     spelling: str
     arg_types: list[str]
     return_type: str
@@ -53,15 +59,33 @@ class Fake:
         return generated
 
     def get_declaration(self) -> str:
+        """
+        Get the FFF fake function declaration macro string
+        example: DECLARE_FAKE_VALUE_FUNC(int, foo, char)
+        """
         return self._generate_fake('DECLARE_')
 
     def get_definition(self) -> str:
+        """
+        Get FFF fake function defenition macro string,
+        used when there is a header file with fake function declaration macro
+        example: DEFINE_FAKE_VALUE_FUNC(int, foo, char)
+        """
         return self._generate_fake('DEFINE_')
 
-    def get_define_str(self) -> str:
+    def get_define(self) -> str:
+        """
+        Get FFF fake function defenition macro string,
+        used when there is no header file with fake function declaration macro
+        example: FAKE_VALUE_FUNC(int, foo, char)
+        """
         return self._generate_fake()
 
     def get_fake_list_entry(self, last: bool = False) -> str:
+        """
+        Helper function that return string used in macro defenition,
+        when last there is no '\' on the end of a string
+        """
         if last:
             return f" FAKE({self.spelling})\n"
         else:
@@ -114,7 +138,7 @@ DEFINE_FFF_GLOBALS;
         source_str += '\n'.join([fake.get_definition() for fake in fakes])
     else:
         source_str += "\n#include <fff.h>\n"
-        source_str += '\n'.join([fake.get_define_str() for fake in fakes])
+        source_str += '\n'.join([fake.get_define() for fake in fakes])
 
     source_str += MERGE_TOKEN_STRING
     source_str += '\n\n'

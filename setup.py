@@ -1,16 +1,15 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='fffauto',
     version='1.0.0',
-    url='https://github.com/naaysayer/fff-auto',
-    py_modules=['fffauto'],
-    packages=['fffauto'],
-    include_package_data=True,
+    packages=find_packages(),
+    install_requires=[
+        'libclang'
+    ],
     entry_points={
         'console_scripts': [
-            'fffauto = fffauto.fffauto:main',
+            'fffauto = fffauto.main:main',
         ],
-
-    }
+    },
 )

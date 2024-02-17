@@ -1,46 +1,43 @@
-Usage
-
-Script for generate [FFF library](https://github.com/meekrosoft/fff) files.
-Generate .h header file with 'FAKE_FUNCTION_DECLARATION's and FAKE_LIST. and .cc source file fit 'FAKE_FUNCTION_DEFINITION's.
-
-Designed to be used with [AST-parser](https://github.com/naaysayer/AST-fcall-probe)
-
-Generate from json file with structure:
-```json
-[
-    {
-        "function_name": "foo",
-        "return_value_type": "int",
-        "args": [ "int", "int" ]
-    },
-    ...
-]
-```
+Generate [FFF library](https://github.com/meekrosoft/fff) files, with fakes function parsed from source files AST.
 
 Usage:
 ```
-Usage: fffauto.py [-j JSON_FILE]
+usage: autofff.py [-h] [--dry-run] [--exclude [EXCLUDE ...]] [-p PATH] [-v] [-f] [--store-cache] [-m] [--single-file] [-r REGEX] [-o OUT] [FILE] [CFLAGS ...]
 
-Options:
+Generate FFF library fakes from source files. Fakes generated from expression in AST of a source file using regex
+
+positional arguments:
+  FILE                  source file to generate fakes from, if not set fakes would be generated for all files from compilation db
+  CFLAGS                compiler flags, write -- before specify flags
+
+options:
   -h, --help            show this help message and exit
-  -j "FILE.json", --from-json="FILE.json"
-                        Json file to load data from
-  -o OUT_DIR, --output-dir=OUT_DIR
-                        output path
-  -n NAME, --name=NAME  Output file names
-  -f, --force           Overwrite existing files
-  -m, --merge           Merge with existing files after token /* __AUTO_FAKES_MERGE_TOKEN__ */
-
+  --dry-run             Do not generate/write fakes into files
+  --exclude [EXCLUDE ...]
+                        Exclude path from processing, used while processing files from compilation db
+  -p PATH, --build-path PATH
+                        Path to directory that contains clang compilation_commands.json
+  -v, --verbose         print debug information
+  -f, --force           overwrite existing files
+  -m, --merge           Merge with existing files. Generated fake would be added after string contains "/* __AUTO_FFF_MERGE_TOKEN__ */"
+  --single-file         Generate only source file
+  -r REGEX, --regex REGEX
+                        regex to match expressions
+  -o OUT, --output OUT  Output filename without extension .cc and .h files would generated with this name. Default autofakes.h/cc
 ```
 
-When using -m/--merge, new fakes will be placed after the token /* __AUTO_FAKES_MERGE_TOKEN__ */.
-WARRNING: Merge is stupid simple so it would not check existing fakes, it just append new generated strings
+Note:
 
-In my pipeline, I use a slightly modified version of the FFF library because I need to use the actual header with function declarations for types and other stuff.
-The CI pipeline runs as follows:
+You need to install libclang:
 ```
-./fcals -p build/ test.c | jq 'map(select(.function_name | test("^mylib")))' | ./fffauto.py -o build
+	pip install libclang
 ```
 
-That would generate fakes for function called from test.c with prefix 'mylib' into 'build/fakes.cc' and 'build/fakes.h'
+if `regex` not specified all function declaration and expression would be taken, as fakes.
 
+Example:
+
+Getting all function call from 'my_lib'( assuming all function have prefix 'my_lib'), from all sources files in compile_commands.json except build and test directory.
+```
+python3 fffauto.py --exclude ./build ./test -r "^my_lib" --merge -p build
+```
