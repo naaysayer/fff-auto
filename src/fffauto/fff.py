@@ -91,6 +91,11 @@ class Fake:
         else:
             return f" FAKE({self.spelling})\\\n"
 
+    def __eq__(self, other):
+        if not isinstance(other, Fake):
+            return NotImplemented
+        return self.spelling == other.spelling
+
 
 def generate_fake_list(fakes: list[Fake]) -> str:
     fake_list_str = FAKE_LIST_STR

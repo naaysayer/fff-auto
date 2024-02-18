@@ -12,9 +12,29 @@ from pathlib import Path
 
 MERGE_TOKEN_STRING = "/* __AUTO_FFF_MERGE_TOKEN__ */"
 DEFAULT_FILENAME = "autofakes"
+CACHE_FILENAME = ".autofakes_cache"
 
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
+
+
+def _cache(out: str, data: list[fff.Fake]) -> list[fff.Fake]:
+    import pickle
+
+    path = f"{os.path.dirname(out)}/{CACHE_FILENAME}"
+
+    cached = []
+
+    if os.path.exists(path):
+        with open(path, 'rb') as cache:
+            cached = pickle.load(cache)
+
+    diff = [item for item in data if item not in cached]
+
+    with open(path, 'wb') as cache:
+        pickle.dump(data, cache)
+
+    return diff
 
 
 def _path_excluded(path: str, excluded_paths: list[str]) -> bool:
@@ -88,6 +108,9 @@ def main():
     parser.add_argument('--exclude', dest='exclude',
                         help='Exclude path from processing, used while processing files from compilation db',
                         nargs='*')
+    parser.add_argument('--no-cache',
+                        help='Do not save cached values and do not use cache if exists',
+                        action='store_true')
     parser.add_argument('-p', '--build-path', dest='path',
                         help='Path to directory that contains clang compilation_commands.json')
     parser.add_argument('-v', '--verbose',
@@ -145,7 +168,8 @@ def main():
                 compiler flags would be taken from file.
                 Rest of files would be ignored''')
 
-        file_cmd = _read_compile_commands(compiledb_file, args.FILE, args.exclude)
+        file_cmd = _read_compile_commands(compiledb_file,
+                                          args.FILE, args.exclude)
     else:
         file_cmd = [{
                 'file': args.FILE,
@@ -162,11 +186,15 @@ def main():
         logging.error(e)
         sys.exit(1)
 
+    if not args.no_cache:
+        fakes_list = _cache(args.out, fakes_list)
+        logging.info(f"Found {len(fakes_list)} not cached fakes")
+    else:
+        logging.info(f"Found {len(fakes_list)} unique fakes")
+
     if not fakes_list:
         logging.info('Nothing to do here')
         sys.exit(0)
-
-    logging.info(f"Found unique {len(fakes_list)}")
 
     if args.dry_run:
         sys.exit(0)
