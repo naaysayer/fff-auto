@@ -2,7 +2,7 @@
 from clang import cindex
 import re
 
-import fffauto.ast as ast
+from fffauto import ast
 
 # for some node.kinds arguments are empty, but node.type contains info about arguments like that int(int arg1, char)
 _ftype_pattern = re.compile(
@@ -183,7 +183,8 @@ def get_fakes(compile_commands: list[dict],
                 fakes[node.spelling] = node
                 count += 1
 
-        sys.stdout.write(f'{count}\n')
+        if show_progress:
+            sys.stdout.write(f'{count}\n')
         count = 0
 
     return [Fake(node) for name, node in fakes.items()]

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fffauto"
+version = "0.1.1"
+authors = [
+  { name="naaysayer", email="naaysauyer@no-reply.com" }
+]
+description = "FFF library fake generator"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "libclang"
+]
+
+[project.scripts]
+fffauto = "main:main"
+
+[project.urls]
+Homepage = "https://github.com/naaysayer/fff-auto"
+Issues = "https://github.com/naaysayer/fff-auto/issues"

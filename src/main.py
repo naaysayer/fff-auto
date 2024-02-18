@@ -2,9 +2,10 @@
 
 import logging
 import sys
-import fffauto.fff as fff
 import json
 import os
+
+from fffauto import fff
 
 from clang.cindex import TranslationUnitLoadError
 from pathlib import Path
@@ -16,20 +17,16 @@ DEFAULT_FILENAME = "autofakes"
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
 
 
-def _path_excluded(path: Path, excluded_paths: list[Path]) -> bool:
-    if path in excluded_paths:
-        return True
-
-    for exclude_path in excluded_paths:
-        if exclude_path in path.parents:
+def _path_excluded(path: str, excluded_paths: list[str]) -> bool:
+    for excluded in excluded_paths:
+        if excluded in path:
             return True
-
     return False
 
 
 def _read_compile_commands(filepath: Path,
                            specific_file: str = None,
-                           exclude_paths: list[Path] = None) -> list[dict]:
+                           exclude_paths: list[str] = None) -> list[dict]:
 
     commands = dict()
 
@@ -47,7 +44,7 @@ def _read_compile_commands(filepath: Path,
     if not specific_file:
         _compile_db = []
         for cmd in commands:
-            _path = Path(os.path.dirname(cmd['file']))
+            _path = os.path.realpath(os.path.dirname(cmd['file']))
             if not exclude_paths or not _path_excluded(_path, exclude_paths):
                 _compile_db.append({
                     'file': None,
@@ -118,6 +115,10 @@ def main():
 
     args = parser.parse_args()
 
+    if not args.FILE and not args.path:
+        logging.critical('Not enough arguments')
+        sys.exit(1)
+
     if args.verbose:
         logging.root.setLevel(logging.DEBUG)
 
@@ -127,7 +128,7 @@ def main():
     logging.info(f"Output files {source_filename},{header_filename}")
 
     if args.exclude:
-        args.exclude = [Path(os.path.realpath(path)) for path in args.exclude]
+        args.exclude = [os.path.realpath(path) for path in args.exclude]
 
     file_cmd = dict()
 
