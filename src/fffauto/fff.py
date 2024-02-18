@@ -36,7 +36,8 @@ class Fake:
         if match:
             self.return_type = match.group('return_type')
             self.arg_types = [
-                arg.strip() for arg in match.group('arg_types').split(',')
+                arg.strip().replace('*const', '*')
+                for arg in match.group('arg_types').split(',')
             ] if match.group('arg_types') else None
 
     def _generate_fake(self, prefix: str = "") -> str:
