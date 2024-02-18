@@ -71,7 +71,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        prog='autofff.py',
+        prog='fffauto',
         description="""
             Generate FFF library fakes from source files.
             Fakes generated from expression in AST of a source file using regex
