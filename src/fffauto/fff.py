@@ -41,7 +41,7 @@ class Fake:
 
     def _generate_fake(self, prefix: str = "") -> str:
         generated = prefix
-        if self.return_type is None:
+        if self.return_type is None or self.return_type == 'void':
             generated += 'FAKE_VOID_FUNC('
         else:
             generated += 'FAKE_VALUE_FUNC('
@@ -200,7 +200,7 @@ def _merge_into(filename: str,
         token_index = content.find(token)
 
         if token_index != -1:
-            new_content = content[:token_index + len(token)] + ''.join(strings) + '\n' + content[token_index + len(token):]
+            new_content = content[:token_index + len(token)] + ''.join(strings) + content[token_index + len(token):]
             print(f"found token {token} in{filename} at {token_index}")
         else:
             raise Exception(
